@@ -62,7 +62,7 @@ This ensures **only the Metabase container can access the database**, preventing
 
 ---
 
-## 📸 Screenshots Evidence
+## 📸 Screenshots
 
 ### 1️⃣ Metabase Database (PostgreSQL - RDS)
 ![RDS PostgreSQL](Week-6/one.png)
