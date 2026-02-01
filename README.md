@@ -1,99 +1,101 @@
-# Metabase Deployment on Amazon ECS with RDS PostgreSQL
+# Metabase Deployment on Amazon ECS (Fargate) with PostgreSQL RDS Backend
 
 ## 📌 Project Overview
-This project demonstrates the deployment of **Metabase** on **Amazon Elastic Container Service (ECS)** using the **Fargate launch type**, integrated with a **PostgreSQL database hosted on Amazon RDS**.
+This project demonstrates the deployment of **Metabase**, an open-source business intelligence (BI) and analytics platform, on **Amazon Elastic Container Service (ECS)** using the **Fargate launch type**, integrated with a **PostgreSQL database hosted on Amazon RDS**.
 
-The deployment uses the official Metabase Docker image and follows AWS security best practices by ensuring private network communication between ECS tasks and the RDS database.
+The deployment follows AWS security best practices by ensuring **private network communication** between ECS tasks and the RDS instance and restricting database access using **security group referencing**.
 
 ---
 
 ## 🛠️ Services Used
-- Amazon ECS
-- AWS Fargate
+- Amazon ECS (Fargate)
 - Amazon RDS (PostgreSQL)
 - Amazon VPC
-- Security Groups
+- AWS Security Groups
 - Docker (Metabase official image)
 
 ---
 
 ## 📋 Task Summary
 - Deployed Metabase using **Amazon ECS with Fargate**
-- Used the official Docker image from Docker Hub
-- Configured all required **database environment variables** in the ECS task definition
-- Deployed ECS tasks and RDS instance within the **same VPC**
-- Restricted database access using **security group-to-security group rules**
-- Ensured the RDS instance was **not publicly accessible**
+- Integrated Metabase with **PostgreSQL database hosted on Amazon RDS**
+- Used the official Docker image: `metabase/metabase`
+- Configured all required **database environment variables** inside the ECS task definition
+- Deployed ECS tasks and RDS within the **same VPC** for private communication
+- Secured database access using **security group rules that allow only ECS-originated traffic**
 
 ---
 
 ## ⚙️ Configuration Details
 
-### ECS Task Definition
-- **Launch Type:** Fargate
-- **Container Image:** metabase/metabase
-- **Network Mode:** awsvpc
-- **Public IP:** Disabled (private communication)
-
-### Environment Variables Configured
-The following environment variables were defined in the ECS task definition to enable database connectivity:
+### ECS Task Definition Environment Variables
+The following environment variables were configured to enable database connectivity:
 
 - `MB_DB_TYPE=postgres`
-- `MB_DB_DBNAME=<database_name>`
-- `MB_DB_HOST=<rds_endpoint>`
+- `MB_DB_DBNAME=<database-name>`
+- `MB_DB_HOST=<rds-endpoint>`
 - `MB_DB_PORT=5432`
-- `MB_DB_USER=<db_username>`
-- `MB_DB_PASS=<db_password>`
+- `MB_DB_USER=<db-username>`
+- `MB_DB_PASS=<db-password>`
+
+> ⚠️ Sensitive values were securely configured and are not exposed in this repository.
 
 ---
 
-## 🗄️ RDS PostgreSQL Configuration
-- **Engine:** PostgreSQL
-- **Deployment:** Private subnet
-- **Public Access:** Disabled
-- **Port:** 5432
+### Network & Security Architecture
+- ECS tasks and the RDS instance were deployed **inside the same VPC**
+- RDS database was **not publicly accessible**
+- RDS security group allows inbound **TCP traffic on port 5432 only from the ECS task security group**
+- No public database exposure
 
 ---
 
 ## 🔐 Security Configuration
-- **RDS Security Group:**
-  - Inbound rule allows **TCP port 5432**
-  - Source restricted to **ECS task security group only**
-- **ECS Security Group:**
-  - Allows outbound traffic to the RDS instance
 
-This setup ensures the database is isolated from the public internet and accessible only by authorized ECS tasks.
+### RDS Security Group
+- **Inbound Rule:**
+  - Protocol: TCP  
+  - Port: 5432  
+  - Source: ECS Task Security Group only  
+
+This ensures **only the Metabase container can access the database**, preventing unauthorized access.
 
 ---
 
 ## 📸 Screenshots Evidence
 
-### 1️⃣ ECS Cluster & Running Service
-![ECS Cluster](Week-6/one.png)
+### 1️⃣ Metabase Database (PostgreSQL - RDS)
+![RDS PostgreSQL](Week-6/one.png)
 
-### 2️⃣ Task Definition – Metabase Image & Environment Variables
-![Task Definition](Week-6/two.png)
+### 2️⃣ ECS Task Definition
+![ECS Task Definition](Week-6/two.png)
 
-### 3️⃣ RDS PostgreSQL Instance
-![RDS PostgreSQL](Week-6/three.png)
+### 3️⃣ Running ECS Service
+![Running ECS Service](Week-6/three.png)
 
-### 4️⃣ Security Group Configuration
-![Security Group Rules](Week-6/four.png)
+### 4️⃣ Security Group Rule (ECS → RDS on Port 5432)
+![Security Group Rule](Week-6/four.png)
+
+### 5️⃣ Metabase Successfully Setup (Screen 1)
+![Metabase Setup 1](Week-6/five.png)
+
+### 6️⃣ Metabase Successfully Setup (Screen 2)
+![Metabase Setup 2](Week-6/six.png)
 
 ---
 
 ## 🎯 Key Learnings
-- Deploying stateful applications using ECS Fargate
-- Integrating containerized applications with Amazon RDS
-- Managing sensitive configuration via environment variables
-- Implementing secure, private service-to-database communication
+- Deploying multi-tier containerized applications on AWS
+- Integrating ECS services with Amazon RDS
+- Managing sensitive configuration using environment variables
+- Implementing secure inter-service communication using security group referencing
+- Designing private and secure cloud architectures
 
 ---
 
 ## 🚀 Use Case
-This architecture is suitable for:
-- Business intelligence and analytics platforms
-- Secure internal dashboards
-- Production-ready containerized applications with managed databases
-
----
+This architecture is ideal for:
+- Business intelligence platforms
+- Internal analytics dashboards
+- Secure cloud-native application deployments
+- Enterprise data visualization solutions
